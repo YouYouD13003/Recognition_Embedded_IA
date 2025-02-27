@@ -13,7 +13,9 @@ RM := rm -rf
 -include Middlewares/Third_Party/FatFs/src/subdir.mk
 -include FATFS/Target/subdir.mk
 -include FATFS/App/subdir.mk
+-include Drivers/Temp/subdir.mk
 -include Drivers/STM32WBxx_HAL_Driver/Src/subdir.mk
+-include Drivers/SD_CARD/subdir.mk
 -include Drivers/Accelerometer/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -66,7 +68,7 @@ main-build: EMBEDDED_AI_M2.elf secondary-outputs
 
 # Tool invocations
 EMBEDDED_AI_M2.elf EMBEDDED_AI_M2.map: $(OBJS) $(USER_OBJS) D:\STM32\EMBEDDED_AI_M2\STM32WB55RGVX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "EMBEDDED_AI_M2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM32\EMBEDDED_AI_M2\STM32WB55RGVX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EMBEDDED_AI_M2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "EMBEDDED_AI_M2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM32\EMBEDDED_AI_M2\STM32WB55RGVX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EMBEDDED_AI_M2.map" -Wl,--gc-sections -static -L"D:\STM32\EMBEDDED_AI_M2\Core\Src" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

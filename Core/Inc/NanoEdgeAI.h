@@ -31,13 +31,18 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*
 #include <stdint.h>
 
 /* Define */
-#define NEAI_ID "67bf5cf2f568c2548c372fb3"
+#define NEAI_ID "67c03356f568c2548c373c95"
 #define AXIS_NUMBER 6
 #define DATA_INPUT_USER 256
-#define CLASS_NUMBER 2
+#define CLASS_NUMBER 4
 
 #ifndef __NEAI_STATE__
 #define __NEAI_STATE__
+
+
+
+
+
 enum neai_state { 
     NEAI_OK = 0,
     NEAI_INIT_FCT_NOT_CALLED = 123,
@@ -90,6 +95,8 @@ const char *id2class[CLASS_NUMBER + 1] = { // Buffer for mapping class id to cla
 	"unknown",
 	"alexander_marche",
 	"ayoub_marche",
+	"mathias_Marche",
+	"jade_marcheCSV",
 };
 */
 

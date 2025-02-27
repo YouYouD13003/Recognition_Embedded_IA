@@ -25,7 +25,9 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 Drivers/Accelerometer \
+Drivers/SD_CARD \
 Drivers/STM32WBxx_HAL_Driver/Src \
+Drivers/Temp \
 FATFS/App \
 FATFS/Target \
 Middlewares/Third_Party/FatFs/src \

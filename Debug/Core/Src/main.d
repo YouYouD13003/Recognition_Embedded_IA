@@ -42,7 +42,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
  ../Middlewares/Third_Party/FatFs/src/diskio.h \
  ../Middlewares/Third_Party/FatFs/src/ff.h ../FATFS/Target/user_diskio.h \
- ../Core/Inc/NanoEdgeAI.h ../Core/Inc/knowledge.h
+ D:/STM32/EMBEDDED_AI_M2/Drivers/Accelerometer/Accelerometer.h \
+ ../Drivers/STM32WBxx_HAL_Driver/Inc/stm32wbxx_hal_def.h \
+ ../Core/Inc/NanoEdgeAI.h ../Core/Inc/knowledge.h \
+ D:/STM32/EMBEDDED_AI_M2/Drivers/Temp/temp.h
 ../Core/Inc/main.h:
 ../Drivers/STM32WBxx_HAL_Driver/Inc/stm32wbxx_hal.h:
 ../Core/Inc/stm32wbxx_hal_conf.h:
@@ -90,5 +93,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Middlewares/Third_Party/FatFs/src/diskio.h:
 ../Middlewares/Third_Party/FatFs/src/ff.h:
 ../FATFS/Target/user_diskio.h:
+D:/STM32/EMBEDDED_AI_M2/Drivers/Accelerometer/Accelerometer.h:
+../Drivers/STM32WBxx_HAL_Driver/Inc/stm32wbxx_hal_def.h:
 ../Core/Inc/NanoEdgeAI.h:
 ../Core/Inc/knowledge.h:
+D:/STM32/EMBEDDED_AI_M2/Drivers/Temp/temp.h:

@@ -61,6 +61,8 @@ void Error_Handler(void);
 #define SD_CS_GPIO_Port GPIOA
 #define SA0_Pin GPIO_PIN_11
 #define SA0_GPIO_Port GPIOA
+#define temp_io_Pin GPIO_PIN_10
+#define temp_io_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
