@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -40,41 +40,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define LIS3DH_I2C_ADDRESS (0x19 << 1) // Shift the 7-bit address left by 1 bit : 0x19 SA0 OUTPUT AT '1'
-//#define ISM330DHCX_I2C_ADDRESS (0x6B << 1)  // 0xD6 for Write, 0xD7 for Read
-//
-//#define MAX_LINES 200  // Limit file to 200 lines
-//
-//#define WHO_AM_I_REGISTER 0x0F
-//#define OUT_X_L_REGISTER (0x28 | 0x80)  // Set MSB to enable auto-increment
-//#define START_DELAY 30000
-//#define CTRL_REG2 0x21
-//#define CTRL_REG5 0x24
-//#define CTRL_REG1 0x20
-//#define CTRL_REG4 0x23
-//#define CTRL_REG3 0x22
-//#define OUT_X_L_G 0x22  // First register of gyroscope data
-//#define FIFO_CTRL_REG   0x2E
-//
-//#define OUTX_L_G  0x22
-//
-//
-//
 
 #define READ_DURATION 180000 // 3 minutes = 180000 ms (3 * 60 * 1000)
 
-//
-//
-//#define OUTX_L_A 28h
-//
-//#define SAMPLE_WINDOW   256  // Peut être 256, 512 ou 1024
-//
-////#define SAMPLE_WINDOW 16  // Minimum required for NanoEdge AI
-////
-//#define BUFFER_SIZE 4096  // Minimum 16, Maximum 4096
-//// 50-100 lignes
-//// 10-20 ms
-//int imuIndex = 0;        // Track current position in buffer
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -89,33 +57,10 @@ UART_HandleTypeDef hlpuart1;
 
 SPI_HandleTypeDef hspi1;
 
+TIM_HandleTypeDef htim2;
+
 /* USER CODE BEGIN PV */
-//typedef struct
-//{
-//    int16_t x;
-//    int16_t y;
-//    int16_t z;
-//} AccelerometerData;
-//
-//
-//typedef struct {
-//    int16_t x;
-//    int16_t y;
-//    int16_t z;
-//} GyroscopeData;
-//
-//typedef struct {
-//    int16_t ax, ay, az;
-//    int16_t gx, gy, gz;
-//} IMU_Data;
-//
-//IMU_Data imuBuffer[BUFFER_SIZE];  // Buffer to store readings
-//uint8_t who_am_i = 0;
-//FATFS FatFs;   // File system object
-//FIL fil;       // File object
-//FRESULT res;   // Result code
-//UINT bw;       // Bytes written
-//UINT br;       // Bytes read
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -125,6 +70,7 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 int _write(int file, char *ptr, int len);
 /* USER CODE END PFP */
@@ -142,347 +88,6 @@ int _write(int file, char *ptr, int len) {
 
 float input_user_buffer[DATA_INPUT_USER * AXIS_NUMBER];
 
-//
-//
-//
-//void UART_HelloWorld(void) {
-//    const char *msg = "HelloWorld!\r\n";  // Message to send
-//    HAL_UART_Transmit(&hlpuart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-//}
-//
-//void InitializeISM330DHCX2(void) {
-//	uint8_t config[2];
-//	HAL_StatusTypeDef status;
-//
-//	// Step 1: Enable Register Auto-Increment & BDU (CTRL3_C)
-//	config[0] = 0x12; // CTRL3_C register
-//	config[1] = 0x44; // 0b01000100: IF_INC = 1 (Auto-Increment), BDU = 1
-//	status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2,
-//			100);
-//	if (status != HAL_OK)
-//		printf("Error: CTRL3_C setup failed\n");
-//
-//	HAL_Delay(10);
-//
-//	// Step 2: Enable Accelerometer (CTRL1_XL) - 104Hz ODR, ±2g Full Scale, High-Performance Mode
-//	config[0] = 0x10; // CTRL1_XL register
-//	config[1] = 0x50; // 0b01010000: ODR = 104Hz, ±2g, High-Performance Mode
-//	status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2,
-//			100);
-//	if (status != HAL_OK)
-//		printf("Error: CTRL1_XL setup failed\n");
-//
-//	HAL_Delay(10);
-//
-//	// Step 3: Enable Gyroscope (CTRL2_G) - 104Hz ODR, ±1000 dps Full Scale
-//	config[0] = 0x11; // CTRL2_G register
-//	config[1] = 0x48; // 0b01001000: ODR = 104Hz, ±1000 dps
-//	status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2,
-//			100);
-//	if (status != HAL_OK)
-//		printf("Error: CTRL2_G setup failed\n");
-//
-//	HAL_Delay(10);
-//
-//	// Step 4: Enable High-Performance Mode for Accelerometer & Gyroscope (CTRL6_C)
-//	config[0] = 0x15; // CTRL6_C register
-//	config[1] = 0x00; // 0b00000000: High-Performance Mode enabled
-//	status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2,
-//			100);
-//	if (status != HAL_OK)
-//		printf("Error: CTRL6_C setup failed\n");
-//
-//	HAL_Delay(10);
-//
-//	// Step 5: Read Back Register Values for Debugging
-//	uint8_t ctrl1_xl, ctrl2_g, ctrl3_c, ctrl6_c;
-//	HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x10, I2C_MEMADD_SIZE_8BIT,
-//			&ctrl1_xl, 1, 100);
-//	HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x11, I2C_MEMADD_SIZE_8BIT,
-//			&ctrl2_g, 1, 100);
-//	HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x12, I2C_MEMADD_SIZE_8BIT,
-//			&ctrl3_c, 1, 100);
-//	HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x15, I2C_MEMADD_SIZE_8BIT,
-//			&ctrl6_c, 1, 100);
-//
-//	printf("CTRL1_XL = 0x%02X (Should be 0x50)\n", ctrl1_xl);
-//	printf("CTRL2_G  = 0x%02X (Should be 0x48)\n", ctrl2_g);
-//	printf("CTRL3_C  = 0x%02X (Should be 0x44)\n", ctrl3_c);
-//	printf("CTRL6_C  = 0x%02X (Should be 0x00)\n", ctrl6_c);
-//
-//	printf("ISM330DHCX initialization complete\n");
-//}
-//
-//void InitializeISM330DHCX(void)
-//{
-//    uint8_t config[2];
-//    HAL_StatusTypeDef status;
-//
-//    // **Enable Register Auto-Increment & BDU (CTRL3_C)**
-//    config[0] = 0x12; // CTRL3_C register
-//    config[1] = 0x44; // 0b01000100: IF_INC = 1 (Auto-Increment enabled), BDU = 1 (Block Data Update)
-//    status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2, HAL_MAX_DELAY);
-//    if (status != HAL_OK) printf("Failed to configure CTRL3_C (Auto-Increment & BDU), Status: %u\n", status);
-//
-//    // **Configure Gyroscope (CTRL2_G) - 104Hz ODR, ±1000 dps Full Scale**
-//    config[0] = 0x11; // CTRL2_G register
-//    config[1] = 0x48; // 0b01001000: ODR = 104Hz, FS = ±1000 dps
-//    status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2, HAL_MAX_DELAY);
-//    if (status != HAL_OK) printf("Failed to configure CTRL2_G, Status: %u\n", status);
-//
-//    // **Enable High-Performance Mode (CTRL7_G)**
-//    config[0] = 0x16; // CTRL7_G register
-//    config[1] = 0x40; // 0b01000000: High-Performance Mode enabled, HPF enabled
-//    status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2, HAL_MAX_DELAY);
-//    if (status != HAL_OK) printf("Failed to configure CTRL7_G, Status: %u\n", status);
-//}
-//
-//
-//
-//void WriteIMUDataToSD(AccelerometerData *accelData, GyroscopeData *gyroData) {
-//    static int sample_count = 0;  // Counter for collected samples
-//    static char buffer[50000];    // Increased buffer size
-//    static int offset = 0;        // Offset for buffer writing
-//
-//    // 🔥 Print current IMU data before writing
-////    printf("📌 Sample %d -> ax=%d, ay=%d, az=%d, gx=%d, gy=%d, gz=%d\n",
-////           sample_count, accelData->x, accelData->y, accelData->z,
-////           gyroData->x, gyroData->y, gyroData->z);
-//
-//    // 🔥 Check if buffer has enough space before writing
-//    if (offset + 50 >= sizeof(buffer)) {
-//        printf("�?� Buffer overflow prevented! Flushing data early.\n");
-//        sample_count = SAMPLE_WINDOW;  // Force writing to SD
-//    }
-//
-//    // 🔥 Append new IMU sample to buffer
-//    int bytes_written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d,%d,%d,%d,%d,%d,",
-//                                 accelData->x, accelData->y, accelData->z,
-//                                 gyroData->x, gyroData->y, gyroData->z);
-//    if (bytes_written < 0) {
-//        printf("�?� Error formatting IMU data!\n");
-//        return;
-//    }
-//    offset += bytes_written;
-//    sample_count++;
-//
-//    // 🔥 Once we have `SAMPLE_WINDOW` samples, write to SD card
-//    if (sample_count >= SAMPLE_WINDOW) {
-//        buffer[offset - 1] = '\n';  // Replace last comma with newline
-//
-//        // 🔥 Print the full formatted buffer before writing
-//    //    printf("\n�? Full formatted buffer before writing to SD:\n%s\n", buffer);
-//
-//        // 🔥 Retry SD Card Mounting up to 3 times
-//        int retries = 3;
-//        while (retries-- > 0) {
-//            if (f_mount(&FatFs, "", 1) == FR_OK) {
-//      //          printf("✅ SD card mounted successfully.\n");
-//                break;
-//            }
-//            printf("�?� Retry mounting SD card... (%d attempts left)\n", retries);
-//        }
-//        if (retries == 0) {
-//            printf("�?� Failed to mount SD card! Skipping write.\n");
-//            return;
-//        }
-//
-//        // 🔥 Open file and check for errors
-//        res = f_open(&fil, "checkin.csv", FA_OPEN_ALWAYS | FA_WRITE);
-//        if (res != FR_OK) {
-//            printf("�?� Error opening file! FATFS result: %d\n", res);
-//            f_mount(0, "", 0);
-//            return;
-//        }
-//
-//        // 🔥 Move to end of file
-//        f_lseek(&fil, f_size(&fil));
-//
-//        // 🔥 Write data and check for errors
-//        UINT bytesWritten;
-//        res = f_write(&fil, buffer, strlen(buffer), &bytesWritten);
-//        if (res != FR_OK || bytesWritten == 0) {
-//            printf("�?� Error writing to file! FATFS result: %d\n", res);
-//        } else {
-//         //   printf("✅ Successfully wrote %d bytes to SD card.\n", bytesWritten);
-//        }
-//
-//        // 🔥 Ensure data is written immediately
-//        f_sync(&fil);
-//        f_close(&fil);
-//        f_mount(0, "", 0);
-//      //  printf("✅ SD card unmounted.\n");
-//
-//        // Reset buffer for next batch
-//        offset = 0;
-//        sample_count = 0;
-//    }
-//}
-//
-//
-//
-//void ReadIMUData() {
-//    AccelerometerData accelData;
-//    GyroscopeData gyroData;
-//    uint8_t accelDataRaw[6] = {0};
-//    uint8_t gyroDataRaw[6] = {0};
-//    HAL_StatusTypeDef status;
-//
-//    // Read Gyroscope Data
-//    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x22, I2C_MEMADD_SIZE_8BIT, gyroDataRaw, 6, 100);
-//    if (status == HAL_OK) {
-//        gyroData.x = (int16_t)((gyroDataRaw[1] << 8) | gyroDataRaw[0]);
-//        gyroData.y = (int16_t)((gyroDataRaw[3] << 8) | gyroDataRaw[2]);
-//        gyroData.z = (int16_t)((gyroDataRaw[5] << 8) | gyroDataRaw[4]);
-//    } else {
-//        printf("�?� Error reading gyroscope data! Status: %d\n", status);
-//    }
-//
-//    // Read Accelerometer Data
-//    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x28, I2C_MEMADD_SIZE_8BIT, accelDataRaw, 6, 100);
-//    if (status == HAL_OK) {
-//        accelData.x = (int16_t)((accelDataRaw[1] << 8) | accelDataRaw[0]);
-//        accelData.y = (int16_t)((accelDataRaw[3] << 8) | accelDataRaw[2]);
-//        accelData.z = (int16_t)((accelDataRaw[5] << 8) | accelDataRaw[4]);
-//    } else {
-//        printf("�?� Error reading accelerometer data! Status: %d\n", status);
-//    }
-//
-//    // 🔥 Write data to SD card immediately after reading
-//    WriteIMUDataToSD(&accelData, &gyroData);
-//
-//    // Delay for next reading
-//    HAL_Delay(10); // Adjust based on your sampling rate
-//}
-//
-//
-//
-//
-//
-
-
-
-
-//
-//void ReadIMUDataForAI() {
-//    AccelerometerData accelData;
-//    GyroscopeData gyroData;
-//    uint8_t accelDataRaw[6] = {0};
-//    uint8_t gyroDataRaw[6] = {0};
-//    HAL_StatusTypeDef status;
-//
-//    // Read Gyroscope Data
-//    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x22, I2C_MEMADD_SIZE_8BIT, gyroDataRaw, 6, 100);
-//    if (status == HAL_OK) {
-//        gyroData.x = (int16_t)((gyroDataRaw[1] << 8) | gyroDataRaw[0]);
-//        gyroData.y = (int16_t)((gyroDataRaw[3] << 8) | gyroDataRaw[2]);
-//        gyroData.z = (int16_t)((gyroDataRaw[5] << 8) | gyroDataRaw[4]);
-//    }
-//
-//    // Read Accelerometer Data
-//    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x28, I2C_MEMADD_SIZE_8BIT, accelDataRaw, 6, 100);
-//    if (status == HAL_OK) {
-//        accelData.x = (int16_t)((accelDataRaw[1] << 8) | accelDataRaw[0]);
-//        accelData.y = (int16_t)((accelDataRaw[3] << 8) | accelDataRaw[2]);
-//        accelData.z = (int16_t)((accelDataRaw[5] << 8) | accelDataRaw[4]);
-//    }
-//
-//    // Store in buffer
-//    input_user_buffer[sampleIndex * AXIS_NUMBER + 0] = accelData.x;
-//    input_user_buffer[sampleIndex * AXIS_NUMBER + 1] = accelData.y;
-//    input_user_buffer[sampleIndex * AXIS_NUMBER + 2] = accelData.z;
-//    input_user_buffer[sampleIndex * AXIS_NUMBER + 3] = gyroData.x;
-//    input_user_buffer[sampleIndex * AXIS_NUMBER + 4] = gyroData.y;
-//    input_user_buffer[sampleIndex * AXIS_NUMBER + 5] = gyroData.z;
-//
-//    sampleIndex++;
-//
-//    // Check if buffer is full
-//    if (sampleIndex >= SAMPLE_WINDOW) {
-//        ClassifyIMUDataAndWriteToSD();  // 🔥 Run AI and write results to SD
-//        sampleIndex = 0;  // Reset index
-//    }
-//}
-//
-//
-//
-//
-//void WriteToSDCard(const char *filename, const char *data) {
-//    // 🔥 Step 1: Mount SD Card
-//    f_mount(0, "", 0);
-//    if (f_mount(&FatFs, "", 1) != FR_OK) {
-//        return;  // Mount failed, exit function
-//    }
-//
-//    // 🔥 Step 2: Open CSV file in append mode
-//    if (f_open(&fil, filename, FA_OPEN_ALWAYS | FA_WRITE) == FR_OK) {
-//        f_lseek(&fil, f_size(&fil));  // Move to end of file
-//        UINT bytesWritten;
-//        f_write(&fil, data, strlen(data), &bytesWritten);
-//        f_close(&fil);
-//    }
-//
-//    // 🔥 Step 3: Unmount SD Card
-//    f_mount(0, "", 0);
-//}
-//
-//
-
-
-
-//
-
-//
-
-
-//void WaitForStart() {
-//    static uint32_t startTime = 0;
-//    static uint8_t readyToStart = 0;
-//    static uint8_t readingIMU = 0;
-//    static int lastPrintedSecond = -1;  // Track last printed second
-//
-//    if (!readyToStart) {
-//        if (startTime == 0) {
-//            startTime = HAL_GetTick();  // Capture start time
-//            printf("�?� Waiting 30 seconds before starting IMU acquisition...\n");
-//        }
-//
-//        // Calculate elapsed time
-//        uint32_t elapsedTime = HAL_GetTick() - startTime;
-//        int elapsedSeconds = elapsedTime / 1000;  // Convert to seconds
-//
-//        // Print countdown every second
-//        if (elapsedSeconds != lastPrintedSecond) {
-//            printf("�?� Time not elapsed yet: %d / 30 sec\n", elapsedSeconds);
-//            lastPrintedSecond = elapsedSeconds;
-//        }
-//
-//        // Check if 30 seconds have passed
-//        if (elapsedTime >= START_DELAY) {
-//            readyToStart = 1;
-//            readingIMU = 1;
-//            startTime = HAL_GetTick();  // Reset timer for 3-minute countdown
-//            printf("✅ 30 seconds elapsed! Starting 3-minute IMU acquisition...\n");
-//        }
-//    }
-//
-//    // If 3-minute window is active, collect data
-//    if (readyToStart && readingIMU) {
-//        // Collect IMU data
-//      //  ClassifyIMUDataAndWriteToSD();
-//       // ReadIMUDataForAI();
-//    	 ReadIMUData();
-//        // Check if 3 minutes have passed
-//        if (HAL_GetTick() - startTime >= READ_DURATION) {
-//            readingIMU = 0;  // Stop data collection
-//            printf("✅ 3-minute IMU acquisition complete. Stopping data collection.\n");
-//        }
-//    }
-//}
-
-//
-
-
 /* USER CODE END 0 */
 
 /**
@@ -499,8 +104,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -524,46 +128,27 @@ int main(void)
   if (MX_FATFS_Init() != APP_OK) {
     Error_Handler();
   }
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
-//
-//  HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(&hi2c1, LIS3DH_I2C_ADDRESS, 3, 100);
-//
-//    if (status == HAL_OK)
-//    {
-//        // Device is ready
-//        printf("LIS3DH is ready for communication.\n");
-//    }
-//    else
-//    {
-//        // Device not ready or communication failed
-//        printf("LIS3DH is not ready. HAL_StatusTypeDef: %d\n", status);
-//    }
+//SET SA0 = "1"
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
 
+	HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(&hi2c1,
+	ISM330DHCX_I2C_ADDRESS, 3, 100);
 
+	if (status == HAL_OK) {
+		// Device is ready
+		printf("ISM330DHCX is ready for communication.\n");
+	} else {
+		// Device not ready or communication failed
+		printf("ISM330DHCX is not ready. HAL_StatusTypeDef: %d\n", status);
+	}
 
-
-  HAL_StatusTypeDef  status = HAL_I2C_IsDeviceReady(&hi2c1, ISM330DHCX_I2C_ADDRESS, 3, 100);
-
-	    if (status == HAL_OK)
-	    {
-	        // Device is ready
-	        printf("Gyro is ready for communication.\n");
-	    }
-	    else
-	    {
-	        // Device not ready or communication failed
-	        printf("Gyro is not ready. HAL_StatusTypeDef: %d\n", status);
-	    }
-//
-//
-//
-//
-//
-    InitializeISM330DHCX2();
-//    AccelerometerData data;
-//    GyroscopeData data_g;
+	InitializeISM330DHCX2();
+	InitializeNanoEdgeAI();
+	//TMP1826_Init();
+	TMP1826_Init();
 
   /* USER CODE END 2 */
 
@@ -578,89 +163,45 @@ int main(void)
 //    HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x0F, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, 100);
 //    HAL_Delay(500);
 //    printf("ISM330DHCX WHO_AM_I: 0x%02X\n", who_am_i); // should get  0x6B
+	AccelerometerData accel;
+	GyroscopeData gyro;
+	HAL_TIM_Base_Start(&htim2);
+	int count = 0;
+	while (1) {
 
-  //  InitializeAI();
-    AccelerometerData accel;
-    GyroscopeData gyro;
-  while (1)
-  {
+		       float temperature = TMP1826_ReadTemperature();
+		       printf("Temperature: %.2f C\r\n", temperature);
+
+
+
+		           HAL_Delay(1000);  // Read temperature every 2 seconds
+
+
+
+
     /* USER CODE END WHILE */
-
-
 
     /* USER CODE BEGIN 3 */
 
-
-	// ReadIMUData(&data,&data_g);
-	  ReadIMUData(&accel,&gyro);
-	// HAL_Delay(500);
-	//  WriteIMUDataToSD();
-
-
-
-
-
-//	   TMP1826_StartConversion();
-//	        HAL_Delay(750);  // Wait for conversion
-//	        float temp = TMP1826_ReadTemperature();
-//	        printf("Temperature: %.2f°C\n", temp);
-//	        HAL_Delay(1000);
-	//  ReadIMUData();
-
-
-
-
-	// WaitForStart();
-	// ClassifyIMUDataAndWriteToSD();
-
-	 // HAL_Delay(10);
-
-	  //  ReadIMUDataForAI();
-
-
-	  //    imuIndex = 0;  // Reset buffer index
-
-
-
-	  //ReadAccelerometerData(&data);
-	// ReadGyroscopeData(&data_g);
-	 // HAL_Delay(500);
-//	  Test_I2C_Communication();
-
-//	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, SET);
 //
-//	  HAL_Delay(500);
+//		float temperature = TMP1826_ReadTemperature();
 //
 //
-//	  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_11, RESET);
+//		        char buffer[50];
 //
-//	  HAL_Delay(500);
+//		        printf("buffer, Temperature: %.2f C\r\n",temperature);
 
-//	  // Read a single register using DMA
-//	  if (LIS3DH_ReadRegister_DMA(0x28, buffer) == HAL_OK) {
-//	      printf("Single register read from OUT_X_L (0x28) successful: Data = 0x%02X\n", buffer[0]);
-//	  } else {
-//	      printf("Single register read from OUT_X_L (0x28) failed!\n");
-//	  }
+//		        HAL_GPIO_WritePin(TMP1826_PORT, TMP1826_PIN, GPIO_PIN_RESET);
+//		        		    printf("Pin LOW\n");
+//		        		    HAL_Delay(1000);
 //
-//	  // Read multiple registers using DMA  // print  words ..
-//	  if (LIS3DH_ReadMultiple_DMA(0x28, buffer, 6) == HAL_OK) {
-//	      printf("Multiple register read starting from OUT_X_L (0x28) successful:\n");
-//	      printf("X_L: 0x%02X, X_H: 0x%02X, Y_L: 0x%02X, Y_H: 0x%02X, Z_L: 0x%02X, Z_H: 0x%02X\n",
-//	             buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]);
-//	  } else {
-//	      printf("Multiple register read starting from OUT_X_L (0x28) failed!\n");
-//	  }
-//
-//
-//	   LIS3DH_ReadAccel(&x,&y,&z);// print real data
+//		        		    HAL_GPIO_WritePin(TMP1826_PORT, TMP1826_PIN, GPIO_PIN_SET);
+//		        		    printf("Pin HIGH\n");
+//		        		    HAL_Delay(1000);
 
-	//  UART_HelloWorld();
+		//ReadIMUData(&accel, &gyro);
 
-	  //HAL_Delay(100);
-
-
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -870,6 +411,51 @@ static void MX_SPI1_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 31;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 4294967295;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -900,9 +486,9 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : temp_io_Pin */
   GPIO_InitStruct.Pin = temp_io_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(temp_io_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -911,24 +497,19 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-    if (hi2c->Instance == I2C1) {
-        // Transmission complete
-        printf("I2C Transmit Complete\n");
-    }
+	if (hi2c->Instance == I2C1) {
+		// Transmission complete
+		printf("I2C Transmit Complete\n");
+	}
 }
 
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-    if (hi2c->Instance == I2C1) {
-        // Reception complete
-        printf("I2C Receive Complete\n");
-    }
+	if (hi2c->Instance == I2C1) {
+		// Reception complete
+		printf("I2C Receive Complete\n");
+	}
 }
-
-
-
-
 
 /* USER CODE END 4 */
 
@@ -939,11 +520,10 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 

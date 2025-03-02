@@ -1,2 +1,2 @@
-../Drivers/SD_CARD/SD_CARD.c:61:6:WriteIMUDataToSD	4
-../Drivers/SD_CARD/SD_CARD.c:108:6:WriteBufferToSD	5
+../Drivers/SD_CARD/SD_CARD.c:14:6:WriteBufferToSD	5
+../Drivers/SD_CARD/SD_CARD.c:46:6:WriteIMUDataToSD	4

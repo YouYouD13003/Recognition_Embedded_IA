@@ -24,6 +24,7 @@ C_DEPS :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
+Drivers/AI \
 Drivers/Accelerometer \
 Drivers/SD_CARD \
 Drivers/STM32WBxx_HAL_Driver/Src \

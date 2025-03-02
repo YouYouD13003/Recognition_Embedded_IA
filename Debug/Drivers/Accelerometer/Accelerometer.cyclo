@@ -1,6 +1,2 @@
-../Drivers/Accelerometer/Accelerometer.c:15:6:InitializeISM330DHCX2	6
-../Drivers/Accelerometer/Accelerometer.c:222:6:ReadIMUData	3
-../Drivers/Accelerometer/Accelerometer.c:268:6:InitializeAI	2
-../Drivers/Accelerometer/Accelerometer.c:280:6:ClassifyIMUDataAndWriteToSD	4
-../Drivers/Accelerometer/Accelerometer.c:316:6:ReadIMUDataForAI	5
-../Drivers/Accelerometer/Accelerometer.c:391:6:ProcessIMUData	4
+../Drivers/Accelerometer/Accelerometer.c:73:6:InitializeISM330DHCX2	7
+../Drivers/Accelerometer/Accelerometer.c:201:6:ReadIMUData	3

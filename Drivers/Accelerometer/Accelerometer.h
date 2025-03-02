@@ -20,8 +20,6 @@
 #define AXIS_NUMBER 6       // IMU has 6 axes (Accelerometer + Gyroscope)
 #define DATA_INPUT_USER 256 // Adjust based on model settings
 
-extern float input_user_buffer[DATA_INPUT_USER * AXIS_NUMBER];
-
 #define ISM330DHCX_I2C_ADDRESS (0x6B << 1)  // 0xD6 for Write, 0xD7 for Read
 #define WHO_AM_I_REGISTER 0x0F
 #define OUT_X_L_REGISTER (0x28 | 0x80)  // Set MSB to enable auto-increment
@@ -35,26 +33,36 @@ extern float input_user_buffer[DATA_INPUT_USER * AXIS_NUMBER];
 #define FIFO_CTRL_REG   0x2E
 #define OUTX_L_G  0x22
 
+extern I2C_HandleTypeDef hi2c1;
+extern float input_user_buffer[DATA_INPUT_USER * AXIS_NUMBER];
+//extern void WriteIMUDataToSD(AccelerometerData *accelData, GyroscopeData *gyroData);
 
-typedef struct
-{
-    int16_t x;
-    int16_t y;
-    int16_t z;
-} AccelerometerData;
+
 
 
 typedef struct {
-    int16_t x;
-    int16_t y;
-    int16_t z;
-} GyroscopeData;
+    int16_t rawX;
+    int16_t rawY;
+    int16_t rawZ;
+    float x;  // Converted value in g
+    float y;
+    float z;
+} AccelerometerData;
 
+typedef struct {
+    int16_t rawX;
+    int16_t rawY;
+    int16_t rawZ;
+    float x;  // Converted value in dps
+    float y;
+    float z;
+} GyroscopeData;
 
 void InitializeISM330DHCX2(void);
 //void ReadIMUData(void);
 void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData);
 void ClassifyIMUDataAndWriteToSD(void);
-
+extern void InitializeNanoEdgeAI(void);
+extern void RunNanoEdgeAI(AccelerometerData *accelData, GyroscopeData *gyroData);
 
 #endif /* ACCELEROMETER_ACCELEROMETER_H_ */

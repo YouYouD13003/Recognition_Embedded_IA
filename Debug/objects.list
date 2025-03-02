@@ -5,6 +5,7 @@
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32wbxx.o"
 "./Core/Startup/startup_stm32wb55rgvx.o"
+"./Drivers/AI/AI.o"
 "./Drivers/Accelerometer/Accelerometer.o"
 "./Drivers/SD_CARD/SD_CARD.o"
 "./Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal.o"
