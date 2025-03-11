@@ -150,7 +150,63 @@ void InitializeISM330DHCX2(void) {
     printf("CTRL6_C Readback: 0x%02X (Expected: 0x02)\n", readback);
 
     printf("ISM330DHCX Initialization Complete with LPF Enabled!\n");
+
+
 }
+
+
+void SleepISM330DHCX2(void) {
+    uint8_t config[2];
+    HAL_StatusTypeDef status;
+
+    printf("Deinitializing ISM330DHCX...\n");
+
+    // Disable Accelerometer by setting the ODR bits to 0 (CTRL1_XL)
+    config[0] = 0x10; // Address of CTRL1_XL
+    config[1] = 0x00; // Set ODR to 0 (power-down)
+    status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2, 100);
+    if (status != HAL_OK) {
+        printf("Error: Failed to disable accelerometer (CTRL1_XL)!\n");
+    }
+    HAL_Delay(10);
+
+    // Disable Gyroscope by setting the ODR bits to 0 (CTRL2_G)
+    config[0] = 0x11; // Address of CTRL2_G
+    config[1] = 0x00; // Set ODR to 0 (power-down)
+    status = HAL_I2C_Master_Transmit(&hi2c1, ISM330DHCX_I2C_ADDRESS, config, 2, 100);
+    if (status != HAL_OK) {
+        printf("Error: Failed to disable gyroscope (CTRL2_G)!\n");
+    }
+    HAL_Delay(10);
+
+    // Optionally, you can add other deinitialization steps if needed
+
+    printf("ISM330DHCX Deinitialized successfully.\n");
+}
+
+void WakeUpISM330DHCX2(void) {
+    uint8_t config;
+    HAL_StatusTypeDef status;
+
+    // Re-enable Accelerometer: 104Hz ODR, ±2g, High-performance mode (CTRL1_XL)
+    config = 0x50;  // Same value you used in full init
+    status = HAL_I2C_Mem_Write(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x10, I2C_MEMADD_SIZE_8BIT, &config, 1, 100);
+    if (status != HAL_OK) {
+        printf("Error: Failed to re-enable accelerometer!\n");
+    }
+    HAL_Delay(10);
+
+    // Re-enable Gyroscope: 104Hz ODR, ±1000 dps (CTRL2_G)
+    config = 0x48;  // Same value as in full init
+    status = HAL_I2C_Mem_Write(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x11, I2C_MEMADD_SIZE_8BIT, &config, 1, 100);
+    if (status != HAL_OK) {
+        printf("Error: Failed to re-enable gyroscope!\n");
+    }
+    HAL_Delay(10);
+
+    printf("ISM330DHCX wake-up complete by updating ODR registers.\n");
+}
+
 
 
 // AI
@@ -198,6 +254,7 @@ void InitializeISM330DHCX2(void) {
 
 
 ////// latest
+
 void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
    uint8_t accelDataRaw[6] = {0};
    uint8_t gyroDataRaw[6] = {0};
@@ -257,13 +314,116 @@ void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
        printf(" Error reading accelerometer data! Status: %d\n", status);
    }
 
+
+  HAL_Delay(20);
    // ✅ Write converted data to SD
-   WriteIMUDataToSD(accelData, gyroData);
+  // WriteIMUDataToSD(accelData, gyroData);
+}
+
+void ReadIMUData2(AccelerometerData *accelData, GyroscopeData *gyroData,uint32_t Delay) {
+   uint8_t accelDataRaw[6] = {0};
+   uint8_t gyroDataRaw[6] = {0};
+   HAL_StatusTypeDef status;
+
+   //  Read Gyroscope Data
+   status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x22,
+                              I2C_MEMADD_SIZE_8BIT, gyroDataRaw, 6, 50);
+   if (status == HAL_OK) {
+       //  Convert from little-endian format
+       int16_t rawGyroX = (int16_t)((gyroDataRaw[0]) | (gyroDataRaw[1] << 8));
+       int16_t rawGyroY = (int16_t)((gyroDataRaw[2]) | (gyroDataRaw[3] << 8));
+       int16_t rawGyroZ = (int16_t)((gyroDataRaw[4]) | (gyroDataRaw[5] << 8));
+
+       //  Convert to degrees per second (dps)
+       float gyroSensitivity = 0.035f; // 35 mdps/LSB = 0.035 dps/LSB
+       gyroData->rawX = rawGyroX;
+       gyroData->rawY = rawGyroY;
+       gyroData->rawZ = rawGyroZ;
+
+       gyroData->x = rawGyroX * gyroSensitivity;
+       gyroData->y = rawGyroY * gyroSensitivity;
+       gyroData->z = rawGyroZ * gyroSensitivity;
+
+       //  Debug Print - Gyroscope
+//       printf("\n Gyroscope Data:");
+       printf("\nRAW -> X: %d, Y: %d, Z: %d", rawGyroX, rawGyroY, rawGyroZ);
+       printf("\nDPS -> X: %.6f, Y: %.6f, Z: %.6f\n", gyroData->x, gyroData->y, gyroData->z);
+   } else {
+       printf(" [HIGH PRIORITY] Error reading gyroscope data! Status: %d\n", status);
+   }
+
+   //  Read Accelerometer Data
+   status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x28,
+                              I2C_MEMADD_SIZE_8BIT, accelDataRaw, 6, 50);
+   if (status == HAL_OK) {
+       //  Convert from little-endian format
+       int16_t rawAccelX = (int16_t)((accelDataRaw[0]) | (accelDataRaw[1] << 8));
+       int16_t rawAccelY = (int16_t)((accelDataRaw[2]) | (accelDataRaw[3] << 8));
+       int16_t rawAccelZ = (int16_t)((accelDataRaw[4]) | (accelDataRaw[5] << 8));
+
+       //  Convert to g (acceleration)
+       float accelSensitivity = 0.000061f; // 0.061 mg/LSB = 0.000061 g/LSB
+       accelData->rawX = rawAccelX;
+       accelData->rawY = rawAccelY;
+       accelData->rawZ = rawAccelZ;
+
+       accelData->x = rawAccelX * accelSensitivity;
+       accelData->y = rawAccelY * accelSensitivity;
+       accelData->z = rawAccelZ * accelSensitivity;
+
+       // 📢 Debug Print - Accelerometer
+//       printf("\nAccelerometer Data:");
+       printf("\nRAW -> X: %d, Y: %d, Z: %d", rawAccelX, rawAccelY, rawAccelZ);
+       printf("\nG  -> X: %.6f, Y: %.6f, Z: %.6f\n", accelData->x, accelData->y, accelData->z);
+   } else {
+       printf(" Error reading accelerometer data! Status: %d\n", status);
+   }
+
+
+   HAL_Delay(Delay);
+   // ✅ Write converted data to SD
+  // WriteIMUDataToSD(accelData, gyroData);
 }
 
 
 
 
+
+
+
+
+void ManageSensorReading(AccelerometerData *accelData, GyroscopeData *gyroData, uint32_t delay, bool sensor_enabled) {
+    if (sensor_enabled) {
+        // Initialize sensor if not already done
+
+
+        	WakeUpISM330DHCX2();
+            // Replace with your sensor init function, e.g., Sensor_Init();
+
+            printf("Sensor initialized and ready to go.\n");
+
+        // Read sensor data based on delay
+            ReadIMUData2(accelData, gyroData, delay);
+    }
+
+    else {
+        // When disabled, stop reading and deinitialize sensor if needed
+
+        	SleepISM330DHCX2();
+            // Replace with your sensor deinit function, e.g., Sensor_Deinit();
+
+            printf("Sensor deinitialized to save power.\n");
+
+        // Optionally, you can include a small delay or sleep to avoid busy looping.
+       //
+    }
+
+
+
+
+
+
+}
 
 
 

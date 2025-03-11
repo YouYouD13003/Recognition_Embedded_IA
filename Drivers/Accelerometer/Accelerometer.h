@@ -13,7 +13,7 @@
 #include "stm32wbxx_hal.h"
 #include "stm32wbxx_hal_def.h"
 #include "NanoEdgeAI.h"
-
+#include "stdbool.h"
 #include <stdint.h>  // Include this for int16_t
 
 
@@ -58,7 +58,10 @@ typedef struct {
     float z;
 } GyroscopeData;
 
+
 void InitializeISM330DHCX2(void);
+void WakeUpISM330DHCX2(void);
+void SleepISM330DHCX2(void);
 //void ReadIMUData(void);
 void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData);
 void ClassifyIMUDataAndWriteToSD(void);

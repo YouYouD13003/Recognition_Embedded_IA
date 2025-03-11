@@ -1,2 +1,6 @@
 ../Drivers/Accelerometer/Accelerometer.c:73:6:InitializeISM330DHCX2	32	static
-../Drivers/Accelerometer/Accelerometer.c:201:6:ReadIMUData	88	static
+../Drivers/Accelerometer/Accelerometer.c:158:6:SleepISM330DHCX2	24	static
+../Drivers/Accelerometer/Accelerometer.c:187:6:WakeUpISM330DHCX2	32	static
+../Drivers/Accelerometer/Accelerometer.c:258:6:ReadIMUData	88	static
+../Drivers/Accelerometer/Accelerometer.c:323:6:ReadIMUData2	96	static
+../Drivers/Accelerometer/Accelerometer.c:395:6:ManageSensorReading	24	static

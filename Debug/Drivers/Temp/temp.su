@@ -8,4 +8,5 @@
 ../Drivers/Temp/temp.c:90:9:TMP1826_ReadBit	16	static
 ../Drivers/Temp/temp.c:107:6:TMP1826_WriteByte	24	static
 ../Drivers/Temp/temp.c:117:9:TMP1826_ReadByte	16	static
-../Drivers/Temp/temp.c:135:7:TMP1826_ReadTemperature	40	static
+../Drivers/Temp/temp.c:130:7:TMP1826_ReadTemperature	40	static
+../Drivers/Temp/temp.c:231:6:ManageTempSensor	24	static

@@ -26,6 +26,7 @@ Core/Src \
 Core/Startup \
 Drivers/AI \
 Drivers/Accelerometer \
+Drivers/Json \
 Drivers/SD_CARD \
 Drivers/STM32WBxx_HAL_Driver/Src \
 Drivers/Temp \

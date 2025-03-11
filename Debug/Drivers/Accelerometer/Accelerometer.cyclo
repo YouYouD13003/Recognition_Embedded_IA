@@ -1,2 +1,6 @@
 ../Drivers/Accelerometer/Accelerometer.c:73:6:InitializeISM330DHCX2	7
-../Drivers/Accelerometer/Accelerometer.c:201:6:ReadIMUData	3
+../Drivers/Accelerometer/Accelerometer.c:158:6:SleepISM330DHCX2	3
+../Drivers/Accelerometer/Accelerometer.c:187:6:WakeUpISM330DHCX2	3
+../Drivers/Accelerometer/Accelerometer.c:258:6:ReadIMUData	3
+../Drivers/Accelerometer/Accelerometer.c:323:6:ReadIMUData2	3
+../Drivers/Accelerometer/Accelerometer.c:395:6:ManageSensorReading	2

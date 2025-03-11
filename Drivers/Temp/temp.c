@@ -61,7 +61,7 @@ uint8_t TMP1826_Reset(void) {
 	delayus(410);  // Complete reset window
 
 	if (presence == 0) {
-	//	printf("TMP1826 Detected (Presence Pulse Received) ✅\n");
+		//	printf("TMP1826 Detected (Presence Pulse Received) ✅\n");
 	} else {
 		printf("TMP1826 NOT Detected (Timing Issue?) ❌\n");
 	}
@@ -127,117 +127,126 @@ uint8_t TMP1826_ReadByte(void) {
 	return byte;
 }
 
-
-
-
-
-
 float TMP1826_ReadTemperature(void) {
- //   printf("🌡️ Starting TMP1826_ReadTemperature()\n");
+	//   printf("🌡️ Starting TMP1826_ReadTemperature()\n");
 
-    if (!TMP1826_Reset()) {
-        printf("❌ TMP1826 not detected!\n");
-        return -999.0f;
-    }
+	if (!TMP1826_Reset()) {
+		printf("❌ TMP1826 not detected!\n");
+		return -999.0f;
+	}
 
-    TMP1826_WriteByte(0xCC);  // Skip ROM
-    TMP1826_WriteByte(0x44);  // Start Temperature Conversion
- //   printf("⏳ TMP1826 Conversion Command Sent\n");
+	TMP1826_WriteByte(0xCC);  // Skip ROM
+	TMP1826_WriteByte(0x44);  // Start Temperature Conversion
+	//   printf("⏳ TMP1826 Conversion Command Sent\n");
 
-    // ✅ **Improved: Increase polling delay & add timeout mechanism**
-    set_gpio_input();
-    int timeout = 1000;  // Avoid infinite loop
-    while (HAL_GPIO_ReadPin(TMP1826_PORT, TMP1826_PIN) == GPIO_PIN_RESET && timeout > 0) {
-        delay_us(200);  // Increased from 100us → 200us
-        timeout--;
-    }
+	// ✅ **Improved: Increase polling delay & add timeout mechanism**
+	set_gpio_input();
+	int timeout = 1000;  // Avoid infinite loop
+	while (HAL_GPIO_ReadPin(TMP1826_PORT, TMP1826_PIN) == GPIO_PIN_RESET
+			&& timeout > 0) {
+		delay_us(200);  // Increased from 100us → 200us
+		timeout--;
+	}
 
-    if (timeout == 0) {
-        printf("❌ TMP1826 Conversion Timeout!\n");
-        return -999.0f;
-    }
+	if (timeout == 0) {
+		printf("❌ TMP1826 Conversion Timeout!\n");
+		return -999.0f;
+	}
 
-  //  printf("✅ TMP1826 Conversion Complete\n");
+	//  printf("✅ TMP1826 Conversion Complete\n");
 
-    if (!TMP1826_Reset()) {
-        printf("❌ TMP1826 not responding after conversion!\n");
-        return -999.0f;
-    }
+	if (!TMP1826_Reset()) {
+		printf("❌ TMP1826 not responding after conversion!\n");
+		return -999.0f;
+	}
 
-    TMP1826_WriteByte(0xCC);
-    TMP1826_WriteByte(0xBE);  // Read Scratchpad
-  //  printf("📖 TMP1826 Read Scratchpad Command Sent\n");
+	TMP1826_WriteByte(0xCC);
+	TMP1826_WriteByte(0xBE);  // Read Scratchpad
+	//  printf("📖 TMP1826 Read Scratchpad Command Sent\n");
 
-    // ✅ **Increase delay before reading Scratchpad**
-    HAL_Delay(15);  // Increased from 5ms → 15ms
+	// ✅ **Increase delay before reading Scratchpad**
+	HAL_Delay(15);  // Increased from 5ms → 15ms
 
-    uint8_t temp_LSB = TMP1826_ReadByte();
+	uint8_t temp_LSB = TMP1826_ReadByte();
 
-    // ✅ **Extra delay before reading MSB**
-    HAL_Delay(2);
+	// ✅ **Extra delay before reading MSB**
+	HAL_Delay(2);
 
-    uint8_t temp_MSB = TMP1826_ReadByte();
+	uint8_t temp_MSB = TMP1826_ReadByte();
 
+	HAL_Delay(2);
+	uint8_t config1 = TMP1826_ReadByte();  // ✅ Read Configuration Register
 
+	// Print Config Register
+	//  printf("Config-1 Register: 0x%02X\n", config1);
 
+	// Check if in 16-bit mode or 12-bit mode
+	bool is_16bit_mode = (config1 & (1 << 2)) != 0;
 
+	if (is_16bit_mode) {
+		//     printf("✅ TMP1826 is in High-Precision Mode (16-bit)\n");
+	} else {
+		//       printf("✅ TMP1826 is in Legacy Mode (12-bit)\n");
+	}
 
+	//   printf("📖 TMP1826 Data Read: LSB = 0x%02X, MSB = 0x%02X\n", temp_LSB, temp_MSB);
 
-    HAL_Delay(2);
-    uint8_t config1 = TMP1826_ReadByte();  // ✅ Read Configuration Register
+	// ✅ **Improve retry mechanism with longer delays**
+	int attempt = 0;
+	while ((temp_LSB == 0xFF && temp_MSB == 0xFF) && attempt < 3) {
+		printf("⚠️ TMP1826 Read Error (0xFFFF), Retrying %d...\n", attempt + 1);
+		HAL_Delay(50);  // Increased retry delay from 10ms → 50ms
+		temp_LSB = TMP1826_ReadByte();
+		temp_MSB = TMP1826_ReadByte();
+		attempt++;
+	}
 
-    // Print Config Register
-  //  printf("Config-1 Register: 0x%02X\n", config1);
+	if (temp_LSB == 0xFF && temp_MSB == 0xFF) {
+		printf("❌ TMP1826 returned invalid data (0xFFFF) after %d attempts\n",
+				attempt);
+		return -999.0f;
+	}
 
-    // Check if in 16-bit mode or 12-bit mode
-    bool is_16bit_mode = (config1 & (1 << 2)) != 0;
+	int16_t temp_raw = (temp_MSB << 8) | temp_LSB;
 
-    if (is_16bit_mode) {
-   //     printf("✅ TMP1826 is in High-Precision Mode (16-bit)\n");
-    } else {
- //       printf("✅ TMP1826 is in Legacy Mode (12-bit)\n");
-    }
-
-
-
-
- //   printf("📖 TMP1826 Data Read: LSB = 0x%02X, MSB = 0x%02X\n", temp_LSB, temp_MSB);
-
-    // ✅ **Improve retry mechanism with longer delays**
-    int attempt = 0;
-    while ((temp_LSB == 0xFF && temp_MSB == 0xFF) && attempt < 3) {
-        printf("⚠️ TMP1826 Read Error (0xFFFF), Retrying %d...\n", attempt + 1);
-        HAL_Delay(50);  // Increased retry delay from 10ms → 50ms
-        temp_LSB = TMP1826_ReadByte();
-        temp_MSB = TMP1826_ReadByte();
-        attempt++;
-    }
-
-    if (temp_LSB == 0xFF && temp_MSB == 0xFF) {
-        printf("❌ TMP1826 returned invalid data (0xFFFF) after %d attempts\n", attempt);
-        return -999.0f;
-    }
-
-    int16_t temp_raw = (temp_MSB << 8) | temp_LSB;
-
-    // ✅ **Handle negative temperatures correctly (Two’s Complement)**
-    if (temp_raw & 0x8000) {
-        temp_raw = -((~temp_raw + 1) & 0xFFFF);
-    }
+	// ✅ **Handle negative temperatures correctly (Two’s Complement)**
+	if (temp_raw & 0x8000) {
+		temp_raw = -((~temp_raw + 1) & 0xFFFF);
+	}
 
 //    float temp_C = temp_raw / 16.0f;
-    float temp_C;
-    if (is_16bit_mode) {
-        temp_C = temp_raw / 128.0f;  // ✅ High-Precision Mode
-    //    printf("✅ Using High-Precision Mode (16-bit): %.2f°C\n", temp_C);
-    } else {
-        temp_C = temp_raw / 16.0f;   // ✅ Legacy Mode (12-bit)
-      //  printf("✅ Using Legacy Mode (12-bit): %.2f°C\n", temp_C);
-    }
-    printf("✅ Temperature Raw: 0x%04X, Converted: %.2f°C\n", temp_raw, temp_C);
+	float temp_C;
+	if (is_16bit_mode) {
+		temp_C = temp_raw / 128.0f;  // ✅ High-Precision Mode
+		//    printf("✅ Using High-Precision Mode (16-bit): %.2f°C\n", temp_C);
+	} else {
+		temp_C = temp_raw / 16.0f;   // ✅ Legacy Mode (12-bit)
+		//  printf("✅ Using Legacy Mode (12-bit): %.2f°C\n", temp_C);
+	}
+	printf("✅ Temperature Raw: 0x%04X, Converted: %.2f°C\n", temp_raw, temp_C);
 
-    return temp_C;
+	return temp_C;
 }
 
+void ManageTempSensor(bool sensor_enabled, uint32_t Delay) {
+	if (sensor_enabled) {
+		// Wake up: Send a reset and conversion command
+		if (!TMP1826_Reset()) {
+			printf("TMP1826 not detected!\n");
+			return;
+		}
 
+		// Wait for conversion (using polling or a delay)
 
+		// Read the temperature
+		float temp = TMP1826_ReadTemperature();
+		printf("Temperature: %.2f°C\n", temp);
+
+		HAL_Delay(Delay);
+	} else {
+		// Sensor disabled: Deinitialize or put sensor in high-impedance mode
+		set_gpio_input();  // High impedance mode minimizes power consumption
+		printf("TMP1826 is in low-power mode.\n");
+	}
+
+}

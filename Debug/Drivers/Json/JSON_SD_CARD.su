@@ -1,0 +1,3 @@
+../Drivers/Json/JSON_SD_CARD.c:41:6:WriteConfigToSD	48	static
+../Drivers/Json/JSON_SD_CARD.c:89:6:ReadConfigFromSD	384	static
+../Drivers/Json/JSON_SD_CARD.c:167:6:UpdateConfigOnSD	32	static

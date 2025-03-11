@@ -150,6 +150,14 @@ int main(void)
 	//TMP1826_Init();
 	TMP1826_Init();
 
+	char greetings[50];
+//	status = HAL_UART_Transmit(&hlpuart1,&greetings, 1, 100);
+//	if (status!=HAL_OK)
+//	{
+//
+//		printf("HAL_UART_Transmit error %d\n", status);
+//	}
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -165,18 +173,67 @@ int main(void)
 //    printf("ISM330DHCX WHO_AM_I: 0x%02X\n", who_am_i); // should get  0x6B
 	AccelerometerData accel;
 	GyroscopeData gyro;
-	HAL_TIM_Base_Start(&htim2);
-	int count = 0;
+
+
+void TestConfigLoop(AccelerometerData *accelData,
+        GyroscopeData *gyroData) {
+    int sampling_frequency;
+    int sensor_enabled;
+
+    // Write default configuration at startup: 500 ms sampling, sensor off.
+
+
+    printf("Default configuration written: Sampling Frequency = 500 ms, Sensor Enabled = OFF\n");
+  //  HAL_Delay(1000);  // Allow time for the SD card to process the write
+
+
+
+    while (1) {
+        // Read the current configuration from the SD card.
+        ReadConfigFromSD(&sampling_frequency, &sensor_enabled);
+        printf("Current Config: Sampling Frequency = %d ms, Sensor Enabled = %s\n",
+               sampling_frequency, sensor_enabled ? "ON" : "OFF");
+
+        // Manage sensor reading based on the current configuration.
+        // If sensor_enabled is true, the sensor will be woken up and data read.
+        // Otherwise, it will be deinitialized to save power.
+        ManageSensorReading(&accelData, &gyroData, sampling_frequency, sensor_enabled);
+
+        // Simulate waiting for user input or an event (3 seconds).
+       // HAL_Delay(3000);
+
+        // For testing: Toggle configuration values.
+        // If sensor is OFF, change to 1000 ms sampling and turn sensor ON.
+        // Otherwise, revert to the default values.
+        if (sensor_enabled == 0) {
+            sampling_frequency = 1000;
+            sensor_enabled = 1;
+        } else {
+            sampling_frequency = 500;
+            sensor_enabled = 0;
+        }
+
+        // Update the configuration on the SD card with the new values.
+        UpdateConfigOnSD(sampling_frequency, sensor_enabled);
+        printf("Updated Config: Sampling Frequency = %d ms, Sensor Enabled = %s\n",
+               sampling_frequency, sensor_enabled ? "ON" : "OFF");
+
+        // Wait another 5 seconds before the next loop iteration.
+       // HAL_Delay(5000);
+    }
+}
+
 	while (1) {
+//
+//		       float temperature = TMP1826_ReadTemperature();
+//		       printf("Temperature: %.2f C\r\n", temperature);
+//
+//
+//
+//		           HAL_Delay(1000);  // Read temperature every 2 seconds
 
-		       float temperature = TMP1826_ReadTemperature();
-		       printf("Temperature: %.2f C\r\n", temperature);
 
-
-
-		           HAL_Delay(1000);  // Read temperature every 2 seconds
-
-
+		TestConfigLoop(&accel,&gyro);
 
 
     /* USER CODE END WHILE */
@@ -199,7 +256,7 @@ int main(void)
 //		        		    printf("Pin HIGH\n");
 //		        		    HAL_Delay(1000);
 
-		//ReadIMUData(&accel, &gyro);
+	//	ReadIMUData(&accel, &gyro);
 
 	}
   /* USER CODE END 3 */

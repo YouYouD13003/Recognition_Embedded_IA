@@ -8,6 +8,90 @@
 
 #include "SD_CARD.h"
 
+void buildFullPath(const char *filename, char *fullPath, size_t size) {
+    snprintf(fullPath, size, "0:%s", filename);
+}
+
+
+char* ReadFileFromSD(const char *filename) {
+    FRESULT res;
+    char fullPath[64];
+
+    res = f_mount(&FatFs, "0:", 1);
+    if (res != FR_OK) {
+         printf("Failed to mount SD card in ReadFileFromSD! (Error code: %d)\n", res);
+         return NULL;
+    }
+
+    buildFullPath(filename, fullPath, sizeof(fullPath));
+    res = f_open(&fil, fullPath, FA_READ);
+    if (res != FR_OK) {
+         printf("Error opening file: %s (Error code: %d)\n", fullPath, res);
+         f_mount(0, "0:", 0);
+         return NULL;
+    }
+
+    DWORD file_size = f_size(&fil);
+    char *buffer = malloc(file_size + 1);
+    if (!buffer) {
+         printf("Memory allocation error in ReadFileFromSD!\n");
+         f_close(&fil);
+         f_mount(0, "0:", 0);
+         return NULL;
+    }
+
+    UINT br;
+    res = f_read(&fil, buffer, file_size, &br);
+    if (res != FR_OK) {
+         printf("Error reading file: %s (Error code: %d)\n", fullPath, res);
+         free(buffer);
+         f_close(&fil);
+         f_mount(0, "0:", 0);
+         return NULL;
+    }
+    buffer[file_size] = '\0';
+
+    f_close(&fil);
+    f_mount(0, "0:", 0);
+    return buffer;
+}
+
+
+void WriteToSDCard(const char *filename, const char *data) {
+    FRESULT res;
+    char fullPath[64];
+
+    // Mount the SD card using drive "0:"
+    res = f_mount(&FatFs, "0:", 1);
+    if (res != FR_OK) {
+         printf("Failed to mount SD card in WriteToSDCard! (Error code: %d)\n", res);
+         return;
+    }
+
+    buildFullPath(filename, fullPath, sizeof(fullPath));
+    res = f_open(&fil, fullPath, FA_CREATE_ALWAYS | FA_WRITE);
+    if (res != FR_OK) {
+         if (res == FR_NOT_ENABLED) {
+             printf("Error: Disk I/O driver not enabled. (FR_NOT_ENABLED, error code: %d)\n", res);
+         } else {
+             printf("Error opening file %s for writing! (Error code: %d)\n", fullPath, res);
+         }
+         f_mount(0, "0:", 0);
+         return;
+    }
+
+    UINT bw;
+    res = f_write(&fil, data, strlen(data), &bw);
+    if (res != FR_OK || bw != strlen(data)) {
+         printf("Error writing to file %s! (Error code: %d)\n", fullPath, res);
+    } else {
+         printf("Successfully wrote %d bytes to %s.\n", bw, fullPath);
+    }
+
+    f_sync(&fil);
+    f_close(&fil);
+    f_mount(0, "0:", 0);
+}
 
 
 

@@ -16,6 +16,7 @@ RM := rm -rf
 -include Drivers/Temp/subdir.mk
 -include Drivers/STM32WBxx_HAL_Driver/Src/subdir.mk
 -include Drivers/SD_CARD/subdir.mk
+-include Drivers/Json/subdir.mk
 -include Drivers/Accelerometer/subdir.mk
 -include Drivers/AI/subdir.mk
 -include Core/Startup/subdir.mk

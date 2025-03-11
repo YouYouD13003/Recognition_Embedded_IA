@@ -8,4 +8,5 @@
 ../Drivers/Temp/temp.c:90:9:TMP1826_ReadBit	1
 ../Drivers/Temp/temp.c:107:6:TMP1826_WriteByte	2
 ../Drivers/Temp/temp.c:117:9:TMP1826_ReadByte	3
-../Drivers/Temp/temp.c:135:7:TMP1826_ReadTemperature	12
+../Drivers/Temp/temp.c:130:7:TMP1826_ReadTemperature	12
+../Drivers/Temp/temp.c:231:6:ManageTempSensor	3
