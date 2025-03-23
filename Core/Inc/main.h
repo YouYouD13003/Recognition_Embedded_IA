@@ -29,9 +29,12 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wbxx_hal.h"
 
+#include "app_conf.h"
+#include "app_entry.h"
+#include "app_common.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -46,7 +49,17 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+extern uint16_t ia;
+extern float accx;
+extern float accy;
+extern float accz;
+extern float gyrx;
+extern float gyry;
+extern float gyrz;
+extern float temp;
+extern int acq;
+extern uint32_t delai;
+//changer nom en delay si temps
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

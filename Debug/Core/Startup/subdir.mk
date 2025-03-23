@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (12.3.rel1)
+# Toolchain: GNU Tools for STM32 (13.3.rel1)
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
@@ -16,7 +16,7 @@ S_DEPS += \
 
 # Each subdirectory must supply rules for building sources it contributes
 Core/Startup/%.o: ../Core/Startup/%.s Core/Startup/subdir.mk
-	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -I"D:/STM32/EMBEDDED_AI_M2/Drivers/Accelerometer" -I"D:/STM32/EMBEDDED_AI_M2/FATFS/Target" -I"D:/STM32/EMBEDDED_AI_M2/Drivers/Temp" -I"D:/STM32/EMBEDDED_AI_M2/Drivers" -I"D:/STM32/EMBEDDED_AI_M2/Debug" -I"D:/STM32/EMBEDDED_AI_M2/Core/Inc" -I"D:/STM32/EMBEDDED_AI_M2/Core/Src" -I"D:/STM32/EMBEDDED_AI_M2/Drivers/SD_CARD" -I"D:/STM32/EMBEDDED_AI_M2/Core" -I"D:/STM32/EMBEDDED_AI_M2/Drivers/AI" -I"D:/STM32/EMBEDDED_AI_M2/Drivers/Json" -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Drivers/Accelerometer" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/FATFS/Target" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Drivers/Temp" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Drivers" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Debug" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Core/Inc" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Core/Src" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Drivers/SD_CARD" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Core" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Drivers/AI" -I"C:/Users/jade.mouillot/STM32CubeIDE/test/Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded/Recognition_Embedded_IA-dev_Ayoub_cleaning/Drivers/Json" -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
 
 clean: clean-Core-2f-Startup
 

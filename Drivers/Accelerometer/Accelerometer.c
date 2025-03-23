@@ -1,6 +1,6 @@
 #include "Accelerometer.h"
 #include "string.h"
-
+#include "main.h"
 
 
 extern void WriteIMUDataToSD(AccelerometerData *accelData, GyroscopeData *gyroData);
@@ -209,53 +209,63 @@ void WakeUpISM330DHCX2(void) {
 
 
 
+
 // AI
-//void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
-//    uint8_t accelDataRaw[6] = {0};
-//    uint8_t gyroDataRaw[6] = {0};
-//    HAL_StatusTypeDef status;
-//
-//    //  Read Gyroscope Data
-//    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x22,
-//                               I2C_MEMADD_SIZE_8BIT, gyroDataRaw, 6, 50);
-//    if (status == HAL_OK) {
-//        int16_t rawGyroX = (int16_t)((gyroDataRaw[0]) | (gyroDataRaw[1] << 8));
-//        int16_t rawGyroY = (int16_t)((gyroDataRaw[2]) | (gyroDataRaw[3] << 8));
-//        int16_t rawGyroZ = (int16_t)((gyroDataRaw[4]) | (gyroDataRaw[5] << 8));
-//
-//        float gyroSensitivity = 0.035f;
-//        gyroData->x = rawGyroX * gyroSensitivity;
-//        gyroData->y = rawGyroY * gyroSensitivity;
-//        gyroData->z = rawGyroZ * gyroSensitivity;
-//    } else {
-//        printf(" Gyroscope Read Error!\n");
-//    }
-//
-//    //  Read Accelerometer Data
-//    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x28,
-//                               I2C_MEMADD_SIZE_8BIT, accelDataRaw, 6, 50);
-//    if (status == HAL_OK) {
-//        int16_t rawAccelX = (int16_t)((accelDataRaw[0]) | (accelDataRaw[1] << 8));
-//        int16_t rawAccelY = (int16_t)((accelDataRaw[2]) | (accelDataRaw[3] << 8));
-//        int16_t rawAccelZ = (int16_t)((accelDataRaw[4]) | (accelDataRaw[5] << 8));
-//
-//        float accelSensitivity = 0.000061f;
-//        accelData->x = rawAccelX * accelSensitivity;
-//        accelData->y = rawAccelY * accelSensitivity;
-//        accelData->z = rawAccelZ * accelSensitivity;
-//    } else {
-//        printf(" Accelerometer Read Error!\n");
-//    }
-//
-//    //  Call AI Model with Converted Data
-//    RunNanoEdgeAI(accelData, gyroData);
-//}
+void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
+    uint8_t accelDataRaw[6] = {0};
+    uint8_t gyroDataRaw[6] = {0};
+    HAL_StatusTypeDef status;
+
+    //  Read Gyroscope Data
+    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x22,
+                               I2C_MEMADD_SIZE_8BIT, gyroDataRaw, 6, 50);
+    if (status == HAL_OK) {
+        int16_t rawGyroX = (int16_t)((gyroDataRaw[0]) | (gyroDataRaw[1] << 8));
+        int16_t rawGyroY = (int16_t)((gyroDataRaw[2]) | (gyroDataRaw[3] << 8));
+        int16_t rawGyroZ = (int16_t)((gyroDataRaw[4]) | (gyroDataRaw[5] << 8));
+
+        float gyroSensitivity = 0.035f;
+        gyroData->x = rawGyroX * gyroSensitivity;
+        gyroData->y = rawGyroY * gyroSensitivity;
+        gyroData->z = rawGyroZ * gyroSensitivity;
+
+        gyrx = gyroData->x;
+        gyry = gyroData->y;
+        gyrz = gyroData->z;
+
+    } else {
+        printf(" Gyroscope Read Error!\n");
+    }
+
+    //  Read Accelerometer Data
+    status = HAL_I2C_Mem_Read(&hi2c1, ISM330DHCX_I2C_ADDRESS, 0x28,
+                               I2C_MEMADD_SIZE_8BIT, accelDataRaw, 6, 50);
+    if (status == HAL_OK) {
+        int16_t rawAccelX = (int16_t)((accelDataRaw[0]) | (accelDataRaw[1] << 8));
+        int16_t rawAccelY = (int16_t)((accelDataRaw[2]) | (accelDataRaw[3] << 8));
+        int16_t rawAccelZ = (int16_t)((accelDataRaw[4]) | (accelDataRaw[5] << 8));
+
+        float accelSensitivity = 0.000061f;
+        accelData->x = rawAccelX * accelSensitivity;
+        accelData->y = rawAccelY * accelSensitivity;
+        accelData->z = rawAccelZ * accelSensitivity;
+
+        accx = accelData->x;
+        accy = accelData->y;
+        accz = accelData->z;
+    } else {
+        printf(" Accelerometer Read Error!\n");
+    }
+
+    //  Call AI Model with Converted Data
+    RunNanoEdgeAI(accelData, gyroData);
+}
 
 
 
 ////// latest
 
-void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
+/*void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
    uint8_t accelDataRaw[6] = {0};
    uint8_t gyroDataRaw[6] = {0};
    HAL_StatusTypeDef status;
@@ -278,6 +288,10 @@ void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
        gyroData->x = rawGyroX * gyroSensitivity;
        gyroData->y = rawGyroY * gyroSensitivity;
        gyroData->z = rawGyroZ * gyroSensitivity;
+
+       //gyrx = gyroData->x;
+       //gyry = gyroData->y;
+       //gyrz = gyroData->z;
 
        //  Debug Print - Gyroscope
 //       printf("\n Gyroscope Data:");
@@ -306,6 +320,10 @@ void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
        accelData->y = rawAccelY * accelSensitivity;
        accelData->z = rawAccelZ * accelSensitivity;
 
+       //accx = accelData->x;
+       //accy = accelData->y;
+       //accz = accelData->z;
+
        // 📢 Debug Print - Accelerometer
 //       printf("\nAccelerometer Data:");
        printf("\nRAW -> X: %d, Y: %d, Z: %d", rawAccelX, rawAccelY, rawAccelZ);
@@ -318,7 +336,7 @@ void ReadIMUData(AccelerometerData *accelData, GyroscopeData *gyroData) {
   HAL_Delay(20);
    // ✅ Write converted data to SD
   // WriteIMUDataToSD(accelData, gyroData);
-}
+}*/
 
 void ReadIMUData2(AccelerometerData *accelData, GyroscopeData *gyroData,uint32_t Delay) {
    uint8_t accelDataRaw[6] = {0};

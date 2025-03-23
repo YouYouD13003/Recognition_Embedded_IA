@@ -7,7 +7,7 @@
 
 
 #include "AI.h"
-
+#include "main.h"
 
 
 void InitializeNanoEdgeAI(void) {
@@ -35,8 +35,11 @@ void RunNanoEdgeAI(AccelerometerData *accelData, GyroscopeData *gyroData) {
 
         if (neai_classification(neai_buffer, output_class_buffer, &id_class) == NEAI_OK) {
             printf(" Classified as: %s (Class ID: %d)\n", id2class[id_class], id_class);
+            //JMO
+            ia = id_class;
         } else {
             printf(" Classification Error!\n");
+            ia = 8; //nb qui n'est pas possible par l'IA -> erreur
         }
 
         // Reset buffer for next batch

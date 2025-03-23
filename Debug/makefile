@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (12.3.rel1)
+# Toolchain: GNU Tools for STM32 (13.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -9,8 +9,18 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include Utilities/sequencer/subdir.mk
+-include Utilities/lpm/tiny_lpm/subdir.mk
+-include STM32_WPAN/Target/subdir.mk
+-include STM32_WPAN/App/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/option/subdir.mk
 -include Middlewares/Third_Party/FatFs/src/subdir.mk
+-include Middlewares/ST/STM32_WPAN/utilities/subdir.mk
+-include Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/subdir.mk
+-include Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci/subdir.mk
+-include Middlewares/ST/STM32_WPAN/ble/svc/Src/subdir.mk
+-include Middlewares/ST/STM32_WPAN/ble/core/template/subdir.mk
+-include Middlewares/ST/STM32_WPAN/ble/core/auto/subdir.mk
 -include FATFS/Target/subdir.mk
 -include FATFS/App/subdir.mk
 -include Drivers/Temp/subdir.mk
@@ -69,8 +79,8 @@ all: main-build
 main-build: EMBEDDED_AI_M2.elf secondary-outputs
 
 # Tool invocations
-EMBEDDED_AI_M2.elf EMBEDDED_AI_M2.map: $(OBJS) $(USER_OBJS) D:\STM32\EMBEDDED_AI_M2\STM32WB55RGVX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "EMBEDDED_AI_M2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM32\EMBEDDED_AI_M2\STM32WB55RGVX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EMBEDDED_AI_M2.map" -Wl,--gc-sections -static -L"D:\STM32\EMBEDDED_AI_M2\Core\Src" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+EMBEDDED_AI_M2.elf EMBEDDED_AI_M2.map: $(OBJS) $(USER_OBJS) C:\Users\jade.mouillot\STM32CubeIDE\test\Recognition_Embedded_IA-dev_Ayoub_cleaning\ (7).zip_expanded\Recognition_Embedded_IA-dev_Ayoub_cleaning\STM32WB55RGVX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "EMBEDDED_AI_M2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\jade.mouillot\STM32CubeIDE\test\Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded\Recognition_Embedded_IA-dev_Ayoub_cleaning\STM32WB55RGVX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EMBEDDED_AI_M2.map" -Wl,--gc-sections -static -L"C:\Users\jade.mouillot\STM32CubeIDE\test\Recognition_Embedded_IA-dev_Ayoub_cleaning (7).zip_expanded\Recognition_Embedded_IA-dev_Ayoub_cleaning\Core\Src" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

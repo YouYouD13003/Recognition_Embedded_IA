@@ -5,6 +5,7 @@
  *      Author: Ayoub
  */
 #include "JSON_SD_CARD.h"
+#include "main.h"
 extern void WriteToSDCard(const char *filename, const char *data);
 extern char *ReadFileFromSD(const char *filename);
 extern void buildFullPath(const char *filename, char *fullPath, size_t size);
@@ -60,6 +61,10 @@ void WriteConfigToSD(const char* filename, const char* json_string) {
     // Declare and initialize variables
     int sampling_frequency = sampling_freq_item->valueint;
     int sensor_enabled = sensor_enabled_item->valueint;
+
+    // JMO
+    sampling_frequency = delai;
+    sensor_enabled = acq;
 
     // Clean up parsed JSON object
     cJSON_Delete(parsed_json);
